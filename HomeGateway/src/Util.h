@@ -1,6 +1,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+//TODO:Make Lib name changes to proper name
+
 //#include <FS.h> //this needs to be first, or it all crashes and burns...
 //#include <ArduinoJson.h> //https://github.com/bblanchon/ArduinoJson
 //#include <ESP8266WiFi.h> //https://github.com/esp8266/Arduino
@@ -13,6 +15,8 @@ class Board
 public:
 static const double Device_Id;
   static const String Activation_Code;
+
+    static bool isFahrenheit;//=false; //Default celsius
 
     static bool isAPOn;
     static bool isAPRequired;

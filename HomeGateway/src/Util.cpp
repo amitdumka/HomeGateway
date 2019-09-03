@@ -1,8 +1,16 @@
 
 //#include <ArduinoJson.h> //https://github.com/bblanchon/ArduinoJson
 #include "Util.h"
+//Change this based on requirement
 
+// Unqiue Id. Can be used to know different devices on network
+const double Board::Device_Id = 67861;
+const String Board::AP_Name = "Amit_IOT_" + String(Board::Device_Id);
 const String Board::Activation_Code = "Att01@24";
+
+// Temp
+bool Board::isFahrenheit=false; //Default celsius
+
 //Change Before Flashing
 const char *Board::SSID = "AMIT_IOT";
 const char *Board::password = "12345678";
@@ -13,13 +21,6 @@ bool Board::wifiConnected = false;
 //AP Config  Check is required now.
 bool Board::isAPOn = false;
 bool Board::isAPRequired = false;
-
-// Unqiue Id. Can be used to know different devices on network
-const double Board::Device_Id = 67861;
-
-const String Board::AP_Name = "Amit_IOT_" + String(Board::Device_Id);
-
-//Change this based on requirement
 
 //Static IP . Check for use if it used or not With WifiManager
 const IPAddress Board::_IP = IPAddress(192, 168, 5, 1);

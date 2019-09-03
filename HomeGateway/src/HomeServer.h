@@ -1,6 +1,10 @@
 #ifndef HOMESERVER_H
 #define HOMESERVER_H
 
+//TODO:  Make This libaray so it can be used by Different board
+//TODO: Make the board pin and i2c port fixed so just wiring is enough  and feature of HomeServer
+// can added by plugin concept. So it can be extended from its original
+
 #define WittyBoard ;           // Witty CLoud Board
 #define NODEMCU ;              // NodeMCU Dev kit
 #define InBuilt_Temp_Sensor 1; // Adding DHT Sensor
@@ -29,7 +33,7 @@
 #include <Arduino.h>
 #include <Hash.h>
 
-#include "Temp.h"
+#include "Tempatures.h"
 
 #define DeviceType WittyBoard;
 
@@ -106,7 +110,8 @@ private:
     static String OPEN_WEATHER_MAP_LOCATION_ID; //= "1272237"; //Dumka
     static String OPEN_WEATHER_MAP_LANGUAGE;    //= "en";
     static const uint8_t MAX_FORECASTS = 4;
-    static const boolean IS_METRIC = true;
+
+    static const boolean IS_METRIC = true;  // Make is True for celsius and false for Fahrenheit. 
 
     // Adjust according to your language
     static const String WDAY_NAMES[7];   //= {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
@@ -225,7 +230,7 @@ void HomeServer::LoopHomeServer()
     }
     if ((millis() - timeSinceLastWUpdate) > timeDHTUpdate)
     {
-        temp.ReadDHTSenor();
+        temp.ReadDHTSensor(Board::isFahrenheit);
         timeSinceLastWUpdate = millis();
     }
 }
@@ -259,7 +264,7 @@ void HomeServer::updateData(OLEDDisplay *display)
     }
     drawProgress(display, 10, "Updating time...");
     drawProgress(display, 20, " Updating Room Temp...");
-    temp.ReadDHTSenor();
+    temp.ReadDHTSensor(Board::isFahrenheit);
     delay(400);
     drawProgress(display, 30, "Updating weather...");
     currentWeatherClient.setMetric(IS_METRIC);

@@ -1,4 +1,4 @@
-#include "Temp.h"
+#include "Tempatures.h"
 
 //Default:
 //int Tempatures::DHTPin = D4;
@@ -11,10 +11,10 @@ Tempatures::Tempatures(int pin, int senType)
     dht= new DHT(DHTPin, DHTType);
     dht->begin();
 }
-
-float Tempatures::ReadDHTSenor(){
+//isFahrenheit 
+float Tempatures::ReadDHTSensor(bool isFahrenheit){
     Humidity = dht->readHumidity();
-    Temp_C = dht->readTemperature();
+    Temp_C = dht->readTemperature(isFahrenheit);
     if (isnan(Humidity) ||isnan(Temp_C))
     {
         Serial.println("Failed to read from DHT sensor!");
@@ -22,7 +22,7 @@ float Tempatures::ReadDHTSenor(){
     }
     else
     {
-        HeatIndex = dht->computeHeatIndex(Temp_C, Humidity, false); // Compute heat index in Celsius
+        HeatIndex = dht->computeHeatIndex(Temp_C, Humidity, isFahrenheit); // Compute heat index in isFahrenheit
         Serial.print("Humidity: ");
         Serial.println(Humidity);
         Serial.print("Temp: ");
@@ -32,9 +32,9 @@ float Tempatures::ReadDHTSenor(){
         
         return Temp_C;
     }
-    
 
 }
+
 float Tempatures::readDHTHumidity()
 {
     Humidity = dht->readHumidity();
@@ -50,9 +50,10 @@ float Tempatures::readDHTHumidity()
     }
 }
 
-float Tempatures::readDHTTemperature()
+
+float Tempatures::readDHTTemperature(bool isFahrenheit)
 {
-    Temp_C = dht->readTemperature();
+    Temp_C = dht->readTemperature(isFahrenheit);
     
     if (isnan(Temp_C))
     {
@@ -66,9 +67,12 @@ float Tempatures::readDHTTemperature()
     }
 }
 
-float Tempatures::readDHTHeatIndex(){
+
+
+// isFahrenheit is true for Fahrenheit  
+float Tempatures::readDHTHeatIndex(bool isFahrenheit){
     readDHTHumidity();readDHTTemperature();
-    HeatIndex = dht->computeHeatIndex(Temp_C, Humidity, false); // Compute heat index in Celsius
+    HeatIndex = dht->computeHeatIndex(Temp_C, Humidity, isFahrenheit); // Compute heat index in Celsius
     return HeatIndex;
     
 }
