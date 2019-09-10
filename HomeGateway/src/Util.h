@@ -37,6 +37,8 @@ static const double Device_Id;
 
 bool CallWiFiManager(bool isNew);
 
+String macToStr(const uint8_t *mac);
+
 //bool ReadConfigFile();
 //bool saveConfiguration();
 //void printFile(const char *filename);

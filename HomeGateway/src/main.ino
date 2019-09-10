@@ -1,7 +1,13 @@
 #include <Arduino.h>
 #include "HomeServer.h"
 #include "CYN_OTA.h"
-#define VERSION 1.2 
+#include "Config.h"
+
+
+#ifdef MQTT_SUPPORT 
+#include "Async_MQTT_Server.h"
+#endif
+#define VERSION 1.3
 
 
 HomeServer home;

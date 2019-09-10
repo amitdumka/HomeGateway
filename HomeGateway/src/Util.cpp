@@ -9,7 +9,7 @@ const String Board::AP_Name = "Amit_IOT_" + String(Board::Device_Id);
 const String Board::Activation_Code = "Att01@24";
 
 // Temp
-bool Board::isFahrenheit=false; //Default celsius
+bool Board::isFahrenheit = false; //Default celsius
 
 //Change Before Flashing
 const char *Board::SSID = "AMIT_IOT";
@@ -53,6 +53,26 @@ bool CallWiFiManager(bool isNew)
     return true;
 }
 
+//generate unique name from MAC addr
+String macToStr(const uint8_t *mac)
+{ //TODO: Need to move to Lib part so can used any where
+
+    String result;
+
+    for (int i = 0; i < 6; ++i)
+    {
+        if ((mac[i] & 0xF0) == 0)
+            result += String(0, HEX); // stop suppression of leading zero
+        result += String(mac[i], HEX);
+
+        if (i < 5)
+        {
+            result += ':';
+        }
+    }
+
+    return result;
+}
 // /**Reading Config File*/
 // bool ReadConfigFile()
 // {
