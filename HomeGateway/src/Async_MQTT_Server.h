@@ -78,6 +78,8 @@ private:
 public:
     void mqtt_loop();
     void mqtt_setup();
+    void Publish(char *topic, char *message);
+    void Subscribe(char *topic);
 };
 
 #endif

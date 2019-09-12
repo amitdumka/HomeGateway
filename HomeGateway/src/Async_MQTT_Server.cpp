@@ -1,31 +1,5 @@
 #include "Async_MQTT_Server.h"
 
-// //TODO: Impelemetation check
-// void Async_MQTT::connectToWifi()
-// {
-//     if(!Board::wifiConnected)
-//     {Serial.println("Connecting to Wi-Fi...");
-//     WiFi.begin();
-//     }else
-//     {
-//         connectToMqtt();
-//     }
-    
-// }
-// //TODO: Impelemetation check
-// void Async_MQTT::onWifiConnect(const WiFiEventStationModeGotIP &event)
-// {
-//     Serial.println("Connected to Wi-Fi.");
-//     connectToMqtt();
-// }
-
-// //TODO: Impelemetation check
-// void Async_MQTT::onWifiDisconnect(const WiFiEventStationModeDisconnected &event)
-// {
-//     Serial.println("Disconnected from Wi-Fi.");
-//     mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
-//     wifiReconnectTimer.once(2, connectToWifi);
-// }
 
 //TODO: Impelemetation check
 void Async_MQTT::connectToMqtt()
@@ -130,17 +104,10 @@ void Async_MQTT::mqtt_setup()
     Serial.println("Starting MQTT Client ....");
 
 #ifdef ESP32
-   // WiFi.onEvent(WiFiEvent);
+  
     mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
-    //wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
-
+   
 #endif
-
-// #ifdef NODEMCU
-//     wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
-//     wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
-
-// #endif
 
     mqttClient.onConnect(onMqttConnect);
     mqttClient.onDisconnect(onMqttDisconnect);
@@ -175,27 +142,6 @@ void Async_MQTT::mqtt_loop()
 {
 }
 
-// #ifdef ESP32
-// void Async_MQTT::WiFiEvent(WiFiEvent_t event)
-// {
-//     Serial.printf("[WiFi-event] event: %d\n", event);
-//     switch (event)
-//     {
-//     case SYSTEM_EVENT_STA_GOT_IP:
-//         Serial.println("WiFi connected");
-//         Serial.println("IP address: ");
-//         Serial.println(WiFi.localIP());
-//         connectToMqtt();
-//         break;
-//     case SYSTEM_EVENT_STA_DISCONNECTED:
-//         Serial.println("WiFi lost connection");
-//         xTimerStop(mqttReconnectTimer, 0); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
-//         xTimerStart(wifiReconnectTimer, 0);
-//         break;
-//     }
-// }
-
-// #endif
 
 void Async_MQTT::setClientDetails()
 {
@@ -226,9 +172,20 @@ void Async_MQTT::BasicHandler(char *topic)
 //Handle message and do operations
 void Async_MQTT::TopicHandler( char *topic , char *paylod)
 {
-    switch(0){
-        default: break;
-
+    if(topic==Topic_Temp){
+        Publish(Topic_Temp,"0.0c"); //TODO: Final Check.
     }
 
+}
+
+
+void Async_MQTT::Publish(char *topic, char *message){
+
+    mqttClient.publish(topic, 0, true, message);
+}
+    
+void Async_MQTT::Subscribe(char *topic){
+
+    Serial.print("Subscribing at QoS 2, packetId: ");
+    Serial.println(mqttClient.subscribe(topic, 2));
 }
