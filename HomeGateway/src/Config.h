@@ -4,10 +4,12 @@
 //Config
 //Features Config
 #define MQTT_SUPPORT ;
+#define InBuilt_Temp_Sensor 1; // Adding DHT Sensor
 
 // Board Config
-#define NODEMCU ;
-
+//#define WittyBoard ;          // Witty CLoud Board
+#define NODEMCU ;               // NodeMCU Dev kit
+//#define ESP32DevKit ;         // ESP32 Based Dev Kit
 //#define ESP32 ;
 
 
@@ -27,12 +29,20 @@
 
 #define MQTT_HOST IPAddress(192, 168, 11, 18)
 
+// MQTT Broker Auth 
+#define MQTT_USERNAME "mqtt_c" 
+#define MQTT_PASSWORD "Dumka@@2654"
+
 
 
 //Topic 
 #define Topic_HeatIndex "cymostate/heatindex" 
 #define Topic_Temp  "cymostate/tempature" 
 #define Topic_Humidity "cymostate/humidity" 
+#define Topic_SensorData "cymostate/sensordata" 
+#define Topic_DeviceName "cymostate/device/name" 
+#define Topic_DeviceType "cymostate/device/devicetype" 
+#define Topic_DeviceCategory "cymostate/device/category" 
 
 //end config
 

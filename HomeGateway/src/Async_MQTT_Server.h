@@ -23,7 +23,9 @@ extern "C"
 class Async_MQTT
 {
 private:
+
     static String MQTT_Client_ID;
+
     // Basic Topic
     //topic to subscribe to request for software version (Generic Device, MAC Addr, Filename.ino)
     const char *swVerTopic = "/MQTT_Client_ID+SwVerCommand";
@@ -45,41 +47,32 @@ private:
 #ifdef NODEMCU
     static Ticker mqttReconnectTimer;
     //    static Ticker wifiReconnectTimer;
-
 #endif
 
 #ifdef ESP32
     static TimerHandle_t mqttReconnectTimer;
-//    static TimerHandle_t wifiReconnectTimer;
 #endif
-
-    //    static void onWifiConnect(const WiFiEventStationModeGotIP &event);
-    //    static void onWifiDisconnect(const WiFiEventStationModeDisconnected &event);
-
+    
     static void connectToMqtt();
-
-    // static void connectToWifi();
-
+    
     static void onMqttPublish(uint16_t packetId);
-    static void onMqttConnect(bool sessionPresent);
 
+    static void onMqttConnect(bool sessionPresent);
     static void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
 
     static void onMqttSubscribe(uint16_t packetId, uint8_t qos);
     static void onMqttUnsubscribe(uint16_t packetId);
     static void onMqttMessage(char *topic, char *payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
 
-    // #ifdef ESP32
-    //     static void WiFiEvent(WiFiEvent_t event);
-    // #endif
     static void TopicHandler(char *topic, char *paylod);
-    void BasicHandler(char *topic);
+    static void BasicHandler(char *topic);
 
 public:
+    static bool isMQTTBrokerConnected;
     void mqtt_loop();
     void mqtt_setup();
-    void Publish(char *topic, char *message);
-    void Subscribe(char *topic);
+    static void Publish(char *topic, const char *message);
+    static void Subscribe(char *topic);
 };
 
 #endif

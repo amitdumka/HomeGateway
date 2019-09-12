@@ -1,39 +1,57 @@
 #include "Async_MQTT_Server.h"
 
+bool Async_MQTT::isMQTTBrokerConnected = false;
+AsyncMqttClient Async_MQTT::mqttClient;
+
+#ifdef NODEMCU
+     Ticker Async_MQTT::mqttReconnectTimer;
+    //    static Ticker wifiReconnectTimer;
+#endif
+
+#ifdef ESP32
+     TimerHandle_t Async_MQTT::mqttReconnectTimer;
+//    static TimerHandle_t wifiReconnectTimer;
+#endif
+
 
 //TODO: Impelemetation check
 void Async_MQTT::connectToMqtt()
 {
     Serial.println("Connecting to MQTT...");
     mqttClient.connect();
+    
 }
 //TODO: Impelemetation check
 void Async_MQTT::onMqttConnect(bool sessionPresent)
 {
+    isMQTTBrokerConnected = true;
+
     Serial.println("Connected to MQTT.");
     Serial.print("Session present: ");
     Serial.println(sessionPresent);
 
     uint16_t packetIdSubT = mqttClient.subscribe(Topic_Temp, 2);
+    
     Serial.print("Subscribing at QoS 2, packetId: ");
     Serial.println(packetIdSubT);
 
     uint16_t packetIdSubH = mqttClient.subscribe(Topic_Humidity, 2);
+    
     Serial.print("Subscribing at QoS 2, packetId: ");
     Serial.println(packetIdSubH);
 
     uint16_t packetIdSubHI = mqttClient.subscribe(Topic_HeatIndex, 2);
+    
     Serial.print("Subscribing at QoS 2, packetId: ");
     Serial.println(packetIdSubHI);
 
-
     mqttClient.publish("cymostate", 0, true, "0.0c");
-    
 }
 
 //TODO: Impelemetation check
 void Async_MQTT::onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
 {
+    isMQTTBrokerConnected = false;
     Serial.println("Disconnected from MQTT.");
 
     if (reason == AsyncMqttClientDisconnectReason::TLS_BAD_FINGERPRINT)
@@ -75,18 +93,8 @@ void Async_MQTT::onMqttMessage(char *topic, char *payload, AsyncMqttClientMessag
     Serial.println("Publish received.");
     Serial.print("  topic: ");
     Serial.println(topic);
-    Serial.print("  qos: ");
-    Serial.println(properties.qos);
-    Serial.print("  dup: ");
-    Serial.println(properties.dup);
-    Serial.print("  retain: ");
-    Serial.println(properties.retain);
-    Serial.print("  len: ");
-    Serial.println(len);
-    Serial.print("  index: ");
-    Serial.println(index);
-    Serial.print("  total: ");
-    Serial.println(total);
+
+    TopicHandler(topic, payload); // Handel Device topic
 }
 
 //TODO: Impelemetation check
@@ -104,9 +112,9 @@ void Async_MQTT::mqtt_setup()
     Serial.println("Starting MQTT Client ....");
 
 #ifdef ESP32
-  
+
     mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
-   
+
 #endif
 
     mqttClient.onConnect(onMqttConnect);
@@ -119,6 +127,7 @@ void Async_MQTT::mqtt_setup()
     mqttClient.onPublish(onMqttPublish);
 
     mqttClient.setServer(MQTT_HOST, MQTT_PORT);
+    mqttClient.setCredentials(MQTT_USERNAME, MQTT_PASSWORD); // Username and password for MQTT Broker to connect.
 
     //TODO: using this way we can pass class method as calbackfuntion instead of making static. check the scope
     //mqttClient.onConnect(std::bind(&Async_MQTT::l,this));
@@ -131,17 +140,14 @@ void Async_MQTT::mqtt_setup()
     }
 #endif
 
-    
     //connectToWifi();
     connectToMqtt();
-
 }
 
 //TODO: Impelemetation check
 void Async_MQTT::mqtt_loop()
 {
 }
-
 
 void Async_MQTT::setClientDetails()
 {
@@ -161,30 +167,45 @@ void Async_MQTT::setClientDetails()
     Serial.println(clientName);
     Serial.print("SW Version : ");
     Serial.println(swVersion);
-
 }
 
 void Async_MQTT::BasicHandler(char *topic)
 {
-
 }
 
 //Handle message and do operations
-void Async_MQTT::TopicHandler( char *topic , char *paylod)
+void Async_MQTT::TopicHandler(char *topic, char *payload)
 {
-    if(topic==Topic_Temp){
-        Publish(Topic_Temp,"0.0c"); //TODO: Final Check.
+    if (topic == Topic_Temp && (payload == "GET" || payload == "get"))
+    {
+        Publish(Topic_Temp, "0.0c"); //TODO: Final Check.
     }
-
+    else if (topic == Topic_HeatIndex && (payload == "GET" || payload == "get"))
+    {
+        Publish(Topic_HeatIndex, "0.0c"); //TODO: Final Check.
+    }
+    else if (topic == Topic_Humidity && (payload == "GET" || payload == "get"))
+    {
+        Publish(Topic_Humidity, "0.0c"); //TODO: Final Check.
+    }
+    else if (topic == Topic_SensorData && payload == "GET" || payload == "get")
+    {
+        Publish(Topic_Temp, "0.0c");      //TODO: Final Check.
+        Publish(Topic_Humidity, "0.0c");  //TODO: Final Check.
+        Publish(Topic_HeatIndex, "0.0c"); //TODO: Final Check.
+    }
+    else
+        BasicHandler(topic);
 }
 
-
-void Async_MQTT::Publish(char *topic, char *message){
+void Async_MQTT::Publish(char *topic, const char *message)
+{
 
     mqttClient.publish(topic, 0, true, message);
 }
-    
-void Async_MQTT::Subscribe(char *topic){
+
+void Async_MQTT::Subscribe(char *topic)
+{
 
     Serial.print("Subscribing at QoS 2, packetId: ");
     Serial.println(mqttClient.subscribe(topic, 2));

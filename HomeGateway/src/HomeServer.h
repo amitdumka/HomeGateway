@@ -1,15 +1,11 @@
 #ifndef HOMESERVER_H
 #define HOMESERVER_H
 
+#include "Config.h"
+
 //TODO:  Make This libaray so it can be used by Different board
 //TODO: Make the board pin and i2c port fixed so just wiring is enough  and feature of HomeServer
 // can added by plugin concept. So it can be extended from its original
-
-#define WittyBoard ;           // Witty CLoud Board
-#define NODEMCU ;              // NodeMCU Dev kit
-#define InBuilt_Temp_Sensor 1; // Adding DHT Sensor
-
-#define ESP32DevKit ; //ESP32 Based Dev Kit
 
 #include <ESPWiFi.h>
 #include <ESPHTTPClient.h>
@@ -34,6 +30,7 @@
 #include <Hash.h>
 
 #include "Tempatures.h"
+#include "Async_MQTT_Server.h"
 
 #define DeviceType WittyBoard;
 
@@ -77,7 +74,9 @@ private:
     void drawProgress(OLEDDisplay *display, int percentage, String label);
     void updateData(OLEDDisplay *display);
     void setReadyForWeatherUpdate();
-
+#ifdef MQTT_SUPPORT
+    void PublishSensorData();
+#endif
     static void drawDateTime(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y);
     static void drawCurrentWeather(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y);
     static void drawForecast(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y);
@@ -111,7 +110,7 @@ private:
     static String OPEN_WEATHER_MAP_LANGUAGE;    //= "en";
     static const uint8_t MAX_FORECASTS = 4;
 
-    static const boolean IS_METRIC = true;  // Make is True for celsius and false for Fahrenheit. 
+    static const boolean IS_METRIC = true; // Make is True for celsius and false for Fahrenheit.
 
     // Adjust according to your language
     static const String WDAY_NAMES[7];   //= {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
@@ -174,7 +173,7 @@ void HomeServer::SetupHomeServer()
     }
     else
         Serial.println("Wifi connected..");
-   
+
     // Get time from network time service
     configTime(TZ_SEC, DST_SEC, "pool.ntp.org");
 
@@ -278,6 +277,11 @@ void HomeServer::updateData(OLEDDisplay *display)
     forecastClient.updateForecastsById(forecasts, OPEN_WEATHER_MAP_APP_ID, OPEN_WEATHER_MAP_LOCATION_ID, MAX_FORECASTS);
     readyForWeatherUpdate = false;
     drawProgress(display, 100, "Done...");
+
+#ifdef MQTT_SUPPORT
+    PublishSensorData(); // Publish to MQTT Broker .
+#endif
+
     delay(1000);
 }
 
@@ -308,7 +312,7 @@ void HomeServer::drawCurrentWeather(OLEDDisplay *display, OLEDDisplayUiState *st
     display->setTextAlignment(TEXT_ALIGN_LEFT);
     String temp = String(HomeServer::currentWeather.temp, 1) + (IS_METRIC ? "°C" : "°F");
     display->drawString(60 + x, 5 + y, temp);
-   
+
     display->setFont(Meteocons_Plain_36);
     display->setTextAlignment(TEXT_ALIGN_CENTER);
     display->drawString(32 + x, 0 + y, HomeServer::currentWeather.iconMeteoCon);
@@ -366,15 +370,28 @@ void HomeServer::drawCurrentRoomTemp(OLEDDisplay *display, OLEDDisplayUiState *s
 {
     display->setFont(ArialMT_Plain_10);
     display->setTextAlignment(TEXT_ALIGN_CENTER);
-    String humd = "Humidity : " + String(temp.Humidity, 1) + "% HI :" + String(temp.HeatIndex, 1) + "°C";
+    String humd = "Humidity : " + String(temp.sensorData.Humidity, 1) + "% HI :" + String(temp.sensorData.HeatIndex, 1) + "°C";
     display->drawString(64 + x, 38 + y, humd);
 
     display->setFont(ArialMT_Plain_24);
     display->setTextAlignment(TEXT_ALIGN_LEFT);
-    String temp1 = String(temp.Temp_C, 1) + (IS_METRIC ? "°C" : "°F");
+    String temp1 = String(temp.sensorData.Temp_C, 1) + (IS_METRIC ? "°C" : "°F");
     display->drawString(60 + x, 5 + y, temp1);
 
     display->setFont(Meteocons_Plain_36);
     display->setTextAlignment(TEXT_ALIGN_CENTER);
     display->drawString(32 + x, 0 + y, currentWeather.iconMeteoCon);
+}
+
+#ifdef MQTT_SUPPORT
+void HomeServer::PublishSensorData()
+{
+    if (temp.isSensorDataChanged())
+    {
+        temp.UpdateLatestData();
+        Async_MQTT::Publish(Topic_Temp, (String(temp.sensorData.Temp_C) + " C").c_str());
+        Async_MQTT::Publish(Topic_Humidity, (String(temp.sensorData.Humidity) + " %").c_str());
+        Async_MQTT::Publish(Topic_HeatIndex, (String(temp.sensorData.HeatIndex) + " C").c_str());
+    }
+#endif
 }

@@ -10,6 +10,7 @@
 
 class FirmwareUpdater
 {
+
 private:
   static const int PORT_NO;
   static const String PassWord; //="LifeLine@500";
@@ -21,6 +22,7 @@ public:
   static void UpdaterLooper();
   void checkForUpdates() ;
   String getMAC();
+
 };
 
 #endif
@@ -101,7 +103,8 @@ void FirmwareUpdater::UpdaterLooper()
 {
   ArduinoOTA.handle();
 }
-void FirmwareUpdater::checkForUpdates() {
+void FirmwareUpdater::checkForUpdates()
+ {
   String mac = getMAC();
   String fwURL = String( fwUrlBase );
   fwURL.concat( mac );
