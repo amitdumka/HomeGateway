@@ -6,11 +6,6 @@ float Sensor::Humidity = 0.0;
 float Sensor::HeatIndex = 0.0;
 
 //Temp class
-
-//Default:
-//int Tempatures::DHTPin = D4;
-//int Tempatures::DHTType = DHT11;
-
 Tempatures::Tempatures(int pin, int senType)
 {
     DHTPin = pin;

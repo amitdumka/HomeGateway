@@ -1,7 +1,7 @@
 #ifndef ASYNC_MQTT_SERVER_H
 #define ASYNC_MQTT_SERVER_H
 
-#include "config.h"
+#include "Config.h"
 #include "Util.h"
 #include <AsyncMqttClient.h>
 #include <Arduino.h>

@@ -6,6 +6,7 @@
 #include <Arduino.h>
 #include <Hash.h>
 //#include <DHT.h>
+#include "Config.h"
 
 class Sensor
 {
@@ -21,8 +22,8 @@ class Tempatures
 
 private:
     //Default:
-    int DHTPin = D4;     //Default pin for NodeMCU
-    int DHTType = DHT11; //Default Type DHT11
+    int DHTPin = DHT_Pin;     //Default pin for NodeMCU   Make Change in config File
+    int DHTType = DHT_Type;   //Default Type DHT11   Make change in config file
 
     DHT *dht;
 

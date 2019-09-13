@@ -1,16 +1,18 @@
 #ifndef CONFIG_H
 #define CONFIG_H
+//Lib Needed for Config File
+#include <Arduino.h>
 
 //Config
 //Features Config
-#define MQTT_SUPPORT ;
-#define InBuilt_Temp_Sensor 1; // Adding DHT Sensor
+#define MQTT_SUPPORT 
+#define InBuilt_Temp_Sensor 1 // Adding DHT Sensor
 
 // Board Config
 //#define WittyBoard ;          // Witty CLoud Board
-#define NODEMCU ;               // NodeMCU Dev kit
-//#define ESP32DevKit ;         // ESP32 Based Dev Kit
-//#define ESP32 ;
+#define NODEMCU                // NodeMCU Dev kit
+//#define ESP32DevKit          // ESP32 Based Dev Kit
+//#define ESP32 
 
 
 
@@ -45,5 +47,28 @@
 #define Topic_DeviceCategory "cymostate/device/category" 
 
 //end config
+
+
+// HomeServer Config
+
+//Cofig Section ; Later should be move to config for better visiblity and readbillity
+
+#define SDC D2 // Pin For oled Display
+#define SDA D1 // Pin For Oled Display
+
+#define DHT_Pin D4  // DHT Sensor Pin is connected to Board Read pin.
+#define DHT_Type DHT11 // Type of Sensor , DHT11 or DHT22
+
+//Time Zone Setting
+
+#define TZ 5.5   // (utc+) TZ in hours  5.5 is for India, Change based on your location
+#define DST_MN 0 // use 60mn for summer time in some countries
+#define TZ_MN ((TZ)*60)
+#define TZ_SEC ((TZ)*3600)
+#define DST_SEC ((DST_MN)*60)
+
+//end config of HomeServer
+
+
 
 #endif

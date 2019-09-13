@@ -7,6 +7,8 @@
 //TODO: Make the board pin and i2c port fixed so just wiring is enough  and feature of HomeServer
 // can added by plugin concept. So it can be extended from its original
 
+//TODO: move all #define to Config.h file and make proper section for each category of config.
+
 #include <ESPWiFi.h>
 #include <ESPHTTPClient.h>
 #include <JsonListener.h>
@@ -34,20 +36,6 @@
 
 #define DeviceType WittyBoard;
 
-//Cofig Section ; Later should be move to config for better visiblity and readbillity
-
-#define SDC D2; // Pin For oled Display
-#define SDA D1; // Pin For Oled Display
-
-#define DHTPin D4;  // DHT Sensor Pin is connected to Board Read pin.
-#define DHTType 11; // Type of Sensor , DHT11 or DHT22
-
-//Time Zone Setting
-#define TZ 5.5   // (utc+) TZ in hours  5.5 is for India, Change based on your location
-#define DST_MN 0 // use 60mn for summer time in some countries
-#define TZ_MN ((TZ)*60)
-#define TZ_SEC ((TZ)*3600)
-#define DST_SEC ((DST_MN)*60)
 
 // Setup
 const int UPDATE_INTERVAL_SECS = 20 * 60; // Update every 20 minutes
@@ -101,8 +89,8 @@ private:
     static const int I2C_DISPLAY_ADDRESS = 0x3c; // Update based on your OLED Device
 
     static Tempatures temp;
-    static const int DHT_Pin = DHTPin;
-    static const int DHT_Type = DHTType;
+    static const int DHTPin = DHT_Pin;
+    static const int DHTType = DHT_Type;
 
     // OpenWeatherMap Settings
     static String OPEN_WEATHER_MAP_APP_ID;      //= "59043edc370e0751a311f35e1d2266ec";
@@ -130,7 +118,7 @@ public:
 #endif
 
 time_t HomeServer::now = time(nullptr);
-Tempatures HomeServer::temp = Tempatures(DHT_Pin, DHT_Type);
+Tempatures HomeServer::temp = Tempatures(DHTPin, DHTType);
 
 OpenWeatherMapCurrentData HomeServer::currentWeather = OpenWeatherMapCurrentData();
 OpenWeatherMapForecastData HomeServer::forecasts[MAX_FORECASTS];
