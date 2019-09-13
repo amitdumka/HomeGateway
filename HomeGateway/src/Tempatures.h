@@ -14,6 +14,7 @@ public:
     static float Temp_C; //by Default get Temp in centigrate
     static float Humidity;
     static float HeatIndex;
+    static bool isFarenhite;
 
 }; 
 
