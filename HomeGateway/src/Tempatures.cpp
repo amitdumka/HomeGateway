@@ -82,7 +82,9 @@ float Tempatures::readDHTHeatIndex(bool isFahrenheit)
 
 bool Tempatures::isSensorDataChanged()
 {
-    if (sensorData.HeatIndex != sensorOldData.HeatIndex || sensorData.Humidity != sensorOldData.Humidity || sensorData.Temp_C != sensorOldData.Temp_C)
+    if (sensorData.HeatIndex != sensorOldData.HeatIndex 
+            || sensorData.Humidity != sensorOldData.Humidity 
+            || sensorData.Temp_C != sensorOldData.Temp_C)
         return true;
     else
         return false;
@@ -90,7 +92,8 @@ bool Tempatures::isSensorDataChanged()
 
 void Tempatures::UpdateLatestData()
 {
+    sensorOldData.Temp_C = sensorData.Temp_C;
     sensorOldData.HeatIndex = sensorData.HeatIndex;
     sensorOldData.Humidity = sensorData.Humidity;
-    sensorOldData.Temp_C = sensorData.Temp_C;
+    
 }

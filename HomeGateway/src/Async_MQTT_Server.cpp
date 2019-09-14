@@ -4,22 +4,20 @@ bool Async_MQTT::isMQTTBrokerConnected = false;
 AsyncMqttClient Async_MQTT::mqttClient;
 
 #ifdef NODEMCU
-     Ticker Async_MQTT::mqttReconnectTimer;
-    //    static Ticker wifiReconnectTimer;
+Ticker Async_MQTT::mqttReconnectTimer;
+//    static Ticker wifiReconnectTimer;
 #endif
 
 #ifdef ESP32
-     TimerHandle_t Async_MQTT::mqttReconnectTimer;
+TimerHandle_t Async_MQTT::mqttReconnectTimer;
 //    static TimerHandle_t wifiReconnectTimer;
 #endif
-
 
 //TODO: Impelemetation check
 void Async_MQTT::connectToMqtt()
 {
     Serial.println("Connecting to MQTT...");
     mqttClient.connect();
-    
 }
 //TODO: Impelemetation check
 void Async_MQTT::onMqttConnect(bool sessionPresent)
@@ -31,21 +29,38 @@ void Async_MQTT::onMqttConnect(bool sessionPresent)
     Serial.println(sessionPresent);
 
     uint16_t packetIdSubT = mqttClient.subscribe(Topic_Temp, 2);
-    
+
     Serial.print("Subscribing at QoS 2, packetId: ");
     Serial.println(packetIdSubT);
 
     uint16_t packetIdSubH = mqttClient.subscribe(Topic_Humidity, 2);
-    
+
     Serial.print("Subscribing at QoS 2, packetId: ");
     Serial.println(packetIdSubH);
 
     uint16_t packetIdSubHI = mqttClient.subscribe(Topic_HeatIndex, 2);
-    
+
     Serial.print("Subscribing at QoS 2, packetId: ");
     Serial.println(packetIdSubHI);
 
-    mqttClient.publish("cymostate", 0, true, "0.0c");
+    uint16_t packetIdSubTG = mqttClient.subscribe(Topic_Temp_GET, 2);
+    Serial.print("Subscribing at QoS 2, packetId: ");
+    Serial.println(packetIdSubTG);
+
+    uint16_t packetIdSubHG = mqttClient.subscribe(Topic_Humidity_GET, 2);
+    Serial.print("Subscribing at QoS 2, packetId: ");
+    Serial.println(packetIdSubHG);
+
+    uint16_t packetIdSubSG = mqttClient.subscribe(Topic_SensorData_GET, 2);
+    Serial.print("Subscribing at QoS 2, packetId: ");
+    Serial.println(packetIdSubSG);
+
+    mqttClient.publish(Topic_Temp, 0, true, String(Tempatures::sensorData.Temp_C).c_str());
+    mqttClient.publish(Topic_Temp_GET, 0, true, String(Tempatures::sensorData.Temp_C).c_str());
+    mqttClient.publish(Topic_Humidity, 0, true, String(Tempatures::sensorData.Humidity).c_str());
+    mqttClient.publish(Topic_Humidity_GET, 0, true, String(Tempatures::sensorData.Humidity).c_str());
+    mqttClient.publish(Topic_HeatIndex, 0, true, String(Tempatures::sensorData.HeatIndex).c_str());
+    mqttClient.publish(Topic_SensorData_GET,0,true, ToJsonObject(Tempatures::sensorData.Temp_C, Tempatures::sensorData.Humidity, Tempatures::sensorData.HeatIndex).c_str());
 }
 
 //TODO: Impelemetation check
@@ -178,21 +193,33 @@ void Async_MQTT::TopicHandler(char *topic, char *payload)
 {
     if (topic == Topic_Temp && (payload == "GET" || payload == "get"))
     {
-        Publish(Topic_Temp, "0.0c"); //TODO: Final Check.
+        Publish(Topic_Temp, String(Tempatures::sensorData.Temp_C).c_str()); //TODO: Final Check.
+    }
+    else if (topic == Topic_Temp_GET)
+    {
+        Publish(Topic_Temp, String(Tempatures::sensorData.Temp_C).c_str()); //TODO: Final Check.
     }
     else if (topic == Topic_HeatIndex && (payload == "GET" || payload == "get"))
     {
-        Publish(Topic_HeatIndex, "0.0c"); //TODO: Final Check.
+        Publish(Topic_HeatIndex, String(Tempatures::sensorData.HeatIndex).c_str()); //TODO: Final Check.
     }
     else if (topic == Topic_Humidity && (payload == "GET" || payload == "get"))
     {
-        Publish(Topic_Humidity, "0.0c"); //TODO: Final Check.
+        Publish(Topic_Humidity, String(Tempatures::sensorData.Humidity).c_str()); //TODO: Final Check.
+    }
+    else if (topic == Topic_Humidity_GET)
+    {
+        Publish(Topic_Humidity_GET, String(Tempatures::sensorData.Humidity).c_str()); //TODO: Final Check.
     }
     else if (topic == Topic_SensorData && payload == "GET" || payload == "get")
     {
-        Publish(Topic_Temp, "0.0c");      //TODO: Final Check.
-        Publish(Topic_Humidity, "0.0c");  //TODO: Final Check.
-        Publish(Topic_HeatIndex, "0.0c"); //TODO: Final Check.
+        Publish(Topic_Temp, String(Tempatures::sensorData.Temp_C).c_str());         //TODO: Final Check.
+        Publish(Topic_Humidity, String(Tempatures::sensorData.Humidity).c_str());   //TODO: Final Check.
+        Publish(Topic_HeatIndex, String(Tempatures::sensorData.HeatIndex).c_str()); //TODO: Final Check.
+    }
+    else if (topic == Topic_SensorData_GET)
+    {
+        Publish(Topic_SensorData_GET, ToJsonObject( Tempatures::sensorData.Temp_C, Tempatures::sensorData.Humidity, Tempatures::sensorData.HeatIndex).c_str());
     }
     else
         BasicHandler(topic);
@@ -209,4 +236,10 @@ void Async_MQTT::Subscribe(char *topic)
 
     Serial.print("Subscribing at QoS 2, packetId: ");
     Serial.println(mqttClient.subscribe(topic, 2));
+}
+
+String Async_MQTT::ToJsonObject(float temp, float hum, float hindex)
+{
+    String jobj = "{ \"temp\":\"" + String(temp) + "\", \"humidity\":\"" + String(hum) + "\", \"heatindex\":\"" + String(hindex) + "\"}";
+    return jobj;
 }

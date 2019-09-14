@@ -5,7 +5,9 @@
 #include "Util.h"
 #include <AsyncMqttClient.h>
 #include <Arduino.h>
+
 #include <Ticker.h>
+#include "Tempatures.h"
 
 // #ifdef NODEMCU
 // #include <ESP8266WiFi.h>
@@ -73,6 +75,8 @@ public:
     void mqtt_setup();
     static void Publish(char *topic, const char *message);
     static void Subscribe(char *topic);
+    static String ToJsonObject(float temp, float hum, float hindex);
+
 };
 
 #endif

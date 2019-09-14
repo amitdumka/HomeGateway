@@ -29,22 +29,26 @@
 #define MQTT_PORT 1883 // Port Might be changed and port use with Mosquitto broker
 #endif
 
-#define MQTT_HOST IPAddress(192, 168, 11, 18)
+#define MQTT_HOST IPAddress(192, 168, 11, 201)
 
 // MQTT Broker Auth 
 #define MQTT_USERNAME "mqtt_c" 
-#define MQTT_PASSWORD "Dumka@@2654"
+#define MQTT_PASSWORD "Dumka@2654"
 
 
 
 //Topic 
+//temperature
 #define Topic_HeatIndex "cymostate/heatindex" 
-#define Topic_Temp  "cymostate/tempature" 
+#define Topic_Temp  "cymostate/temperature"
+#define Topic_Temp_GET  "cymostate/temperature/get" 
 #define Topic_Humidity "cymostate/humidity" 
+#define Topic_Humidity_GET "cymostate/humidity/get" 
 #define Topic_SensorData "cymostate/sensordata" 
 #define Topic_DeviceName "cymostate/device/name" 
 #define Topic_DeviceType "cymostate/device/devicetype" 
 #define Topic_DeviceCategory "cymostate/device/category" 
+#define Topic_SensorData_GET "cymostate/sensordata/get"
 
 //end config
 

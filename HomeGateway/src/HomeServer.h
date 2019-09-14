@@ -36,7 +36,6 @@
 
 #define DeviceType WittyBoard;
 
-
 // Setup
 const int UPDATE_INTERVAL_SECS = 20 * 60; // Update every 20 minutes
 
@@ -218,6 +217,9 @@ void HomeServer::LoopHomeServer()
     if ((millis() - timeSinceLastWUpdate) > timeDHTUpdate)
     {
         temp.ReadDHTSensor(Board::isFahrenheit);
+#ifdef MQTT_SUPPORT
+        PublishSensorData();
+#endif
         timeSinceLastWUpdate = millis();
     }
 }
@@ -377,9 +379,14 @@ void HomeServer::PublishSensorData()
     if (temp.isSensorDataChanged())
     {
         temp.UpdateLatestData();
-        Async_MQTT::Publish(Topic_Temp, (String(temp.sensorData.Temp_C) + " C").c_str());
-        Async_MQTT::Publish(Topic_Humidity, (String(temp.sensorData.Humidity) + " %").c_str());
-        Async_MQTT::Publish(Topic_HeatIndex, (String(temp.sensorData.HeatIndex) + " C").c_str());
+
+        Async_MQTT::Publish(Topic_Temp, (String(temp.sensorData.Temp_C)).c_str());
+        Async_MQTT::Publish(Topic_Humidity, (String(temp.sensorData.Humidity)).c_str());
+        Async_MQTT::Publish(Topic_HeatIndex, (String(temp.sensorData.HeatIndex)).c_str());
+
+        Async_MQTT::Publish(Topic_Temp_GET, (String(temp.sensorData.Temp_C)).c_str());
+        Async_MQTT::Publish(Topic_Humidity_GET, (String(temp.sensorData.Humidity)).c_str());
+        Serial.println("Data changed!!!");
     }
 #endif
 }
