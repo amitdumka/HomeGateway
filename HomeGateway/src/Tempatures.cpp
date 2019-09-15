@@ -1,11 +1,5 @@
 #include "Tempatures.h"
 
-//Sensor class
-float Sensor::Temp_C = 0.0; //by Default get Temp in centigrate
-float Sensor::Humidity = 0.0;
-float Sensor::HeatIndex = 0.0;
-bool Sensor::isFarenhite=false; //TODO: Implement this for Farenhite or celsius 
-
 
 //Temp class
 Tempatures::Tempatures(int pin, int senType)

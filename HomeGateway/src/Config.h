@@ -1,5 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
+
 //Lib Needed for Config File
 #include <Arduino.h>
 
@@ -31,6 +32,9 @@
 
 #define MQTT_HOST IPAddress(192, 168, 11, 201)
 
+//TODO: UserName  & Password should be provided through UI Config Web/App based. 
+// A Default SSL Based username password change and recovery system is needed so can be used with App
+// Web API also can be option
 // MQTT Broker Auth 
 #define MQTT_USERNAME "mqtt_c" 
 #define MQTT_PASSWORD "Dumka@2654"
@@ -38,6 +42,7 @@
 
 
 //Topic 
+//TODO: need to add one more step so unique device id can be used to diff btw two devices
 //temperature
 #define Topic_HeatIndex "cymostate/heatindex" 
 #define Topic_Temp  "cymostate/temperature"
@@ -73,6 +78,8 @@
 
 //end config of HomeServer
 
+//Home Assistance Config and Constant
 
+//end of Home Assistance
 
 #endif

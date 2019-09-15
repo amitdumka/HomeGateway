@@ -62,7 +62,7 @@ private:
     void updateData(OLEDDisplay *display);
     void setReadyForWeatherUpdate();
 #ifdef MQTT_SUPPORT
-    void PublishSensorData();
+    void PublishSensorData(bool isNew);
 #endif
     static void drawDateTime(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y);
     static void drawCurrentWeather(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y);
@@ -218,7 +218,7 @@ void HomeServer::LoopHomeServer()
     {
         temp.ReadDHTSensor(Board::isFahrenheit);
 #ifdef MQTT_SUPPORT
-        PublishSensorData();
+        PublishSensorData(false);
 #endif
         timeSinceLastWUpdate = millis();
     }
@@ -269,7 +269,7 @@ void HomeServer::updateData(OLEDDisplay *display)
     drawProgress(display, 100, "Done...");
 
 #ifdef MQTT_SUPPORT
-    PublishSensorData(); // Publish to MQTT Broker .
+    PublishSensorData(true); // Publish to MQTT Broker .
 #endif
 
     delay(1000);
@@ -374,11 +374,11 @@ void HomeServer::drawCurrentRoomTemp(OLEDDisplay *display, OLEDDisplayUiState *s
 }
 
 #ifdef MQTT_SUPPORT
-void HomeServer::PublishSensorData()
+void HomeServer::PublishSensorData( bool isNew)
 {
-    if (temp.isSensorDataChanged())
+    if (temp.isSensorDataChanged() || isNew==false)
     {
-        temp.UpdateLatestData();
+        temp.UpdateLatestData(); //Copy New Data to Old Data. 
 
         Async_MQTT::Publish(Topic_Temp, (String(temp.sensorData.Temp_C)).c_str());
         Async_MQTT::Publish(Topic_Humidity, (String(temp.sensorData.Humidity)).c_str());
