@@ -1,0 +1,102 @@
+Home Assistant Build 
+
+Step 1: Install/configure Raspbian
+
+	a)	Download ZIP file "Raspbian Stretch with desktop and recommended software" from
+			https://www.raspberrypi.org/downloads/raspbian/
+			
+	b)	Download "BalenaEtcher" from
+			https://www.balena.io/etcher/
+			
+	c)	Run Etcher to image the SD card
+			Just select the .zip file ... Etcher reads the image directly from the .zip
+			
+	d)	Insert SD in RPi and boot
+	
+	e)  Follow Raspbian prompts
+			Set pi password
+			Configure localization settings
+			Configure WiFi
+			Download/apply updates
+			Reboot
+	
+	f)	Under Raspberry/Preferences/Raspberry Pi Configuration/
+			Rename Host: /system/Hostname
+			Enable SSH: /interfaces/SSH
+			Reboot
+			
+-------------------------------------------------------------------------------------------------------------
+			
+Step 2: Install and Activate Home Assistant
+			Reference: https://www.home-assistant.io/docs/installation/raspberry-pi/
+	
+	a)	Create user: "homeassistant"
+			sudo useradd -rm homeassistant -G dialout,gpio
+				
+	b)	Create homeassistant installation directory
+			cd /srv
+			sudo mkdir homeassistant
+			sudo chown homeassistant:homeassistant homeassistant
+				
+	c)	Create and change to a virtual environment for Home Assistant
+			sudo -u homeassistant -H -s
+			cd /srv/homeassistant
+			python3 -m venv .
+			source bin/activate
+
+		<note: command prompt changes when virtual environment is activated>
+		
+	d)	Install a required Python package
+			python3 -m pip install wheel
+		
+	e)	Install homeassistant
+			pip3 install homeassistant
+			
+	f)	Activate homeassistant to complete the installation
+			hass (takes 5 - 10 minutes ... not obvious when it completes, so be patient and allow extra time)
+
+	g)  Configure Home Assistant to start automatically when RPi is booted
+		1)	Run the command: ps -p 1 -o comm=
+			If "systemd" is not displayed, 
+				consult: https://www.home-assistant.io/docs/autostart/
+		2)	Create the file "/etc/systemd/system/home-assistant@homeassistant.service"
+				file contents below:
+_____________________
+[Unit]
+Description=Home Assistant
+After=network-online.target
+
+[Service]
+Type=simple
+User=%i
+ExecStart=/srv/homeassistant/bin/hass -c "/home/homeassistant/.homeassistant"
+
+[Install]
+WantedBy=multi-user.target
+_____________________
+
+		3)	Reload systemd
+				sudo systemctl --system daemon-reload
+
+		4)	Enable the service
+				sudo systemctl enable home-assistant@homeassistant
+		
+	h)	Update to the latest version of Home Assistant
+			sudo -u homeassistant -H -s
+			source /srv/homeassistant/bin/activate
+			pip3 install --upgrade homeassistant
+				
+	i)  Activate the virtual environment
+			sudo -u homeassistant -H -s
+			source /srv/homeassistant/bin/activate
+				
+
+    j) Start Home assistant ???   --- if we take an image next, why start HA now?
+			sudo systemctl start home-assistant@homeassistant
+
+
+			
+Make an image of the SD with Win32DiskImager ... this will take a while ... how long depends on the size and speed of the SD card 64GB SD card took about 80 minutes. 
+-------------------------------------------------------------------------------------------------------------
+IMAGE FILE: ha installed on raspbian.img
+----------------------------

@@ -191,7 +191,7 @@ void Async_MQTT::BasicHandler(char *topic)
 //Handle message and do operations
 void Async_MQTT::TopicHandler(char *topic, char *payload)
 {
-    if (topic == Topic_Temp && (payload == "GET" || payload == "get"))
+    if (topic == Topic_Temp && ( StringCompare( payload ,  "GET") || StringCompare(payload , "get")))
     {
         Publish(Topic_Temp, String(Tempatures::sensorData.Temp_C).c_str()); //TODO: Final Check.
     }

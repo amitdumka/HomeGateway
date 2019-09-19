@@ -1,3 +1,10 @@
+/***
+ *  Sensor.H 
+ *   All Supported sensor is added here 
+ *   Version : 2.0
+ *   Author: Amit Kumar (AKS Labs)
+ *   Year : 2019
+ ***/
 #ifndef SENSOR_H
 #define SENSOR_H
 
