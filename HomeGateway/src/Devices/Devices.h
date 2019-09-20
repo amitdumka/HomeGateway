@@ -1,74 +1,12 @@
-/***
- *  Device.H 
- *   All Supported devices is added here 
- *   Version : 2.0
- *   Author: Amit Kumar (AKS Labs)
- *   Year : 2019
- ***/
-
 #ifndef DEVICES_H
 #define DEVICES_H
 
 #include <Arduino.h>
+#include "Devices/RGBLed.h"
+#include "Devices/InBuiltLed.h"
 
 // TODO:   Version 2.0 is started from Here , and Witty Cloud Based
 // Creating Devices List Supported and thier structer so can be used for any thing
-
-class RGBLed
-{
-private:
-    bool RedLedState, GreenLedState, BlueLedState;
-    int RedLedPin, GreenLedPin, BlueLedPin;
-
-public:
-    RGBLed() { RedLedPin = D8, BlueLedPin = D6, GreenLedPin = D7; }
-    RGBLed(int r, int g, int b);
-    //void setLedState(bool r, bool g, bool b);
-    // void setAnalogColor(float r, float g, float b);
-};
-
-class InBuilt_LED
-{
-private:
-    bool LedState = false;
-    int LedPin;
-
-public:
-    ~InBuilt_LED()
-    {
-        free(this);
-    }
-    InBuilt_LED()
-    {
-        LedPin = D4;
-        LedState = false;
-    }
-    InBuilt_LED(int pin, bool state = false)
-    {
-        LedPin = pin;
-        LedState = state;
-    }
-    // Set State true or false of Led
-    void setState(bool state) { LedState = state; }
-    // Set Pin Mode to OUTPUT mode
-    void setMode() { pinMode(LedPin, OUTPUT); }
-    // Return state of led , true or false.
-    bool  getState() {return LedState;}
-    // Switch On or Off LED , true or false, and set the state
-    void LedOnOff(bool onOff)
-    {
-        if (onOff)
-        {
-            digitalWrite(LedPin, HIGH);
-            LedState = true;
-        }
-        else
-        {
-            digitalWrite(LedPin, LOW);
-            LedState = false;
-        }
-    }
-};
 
 class NodeMCU
 {
@@ -155,12 +93,13 @@ public:
 
     void CallInSetUp();
 
-    void CallInSetUp(){
+    void CallInSetUp()
+    {
         pinMode(LED_I_Pin, INPUT);
         pinMode(Pin_I_OC_Input, INPUT);
         pinMode(Pin_O_Relay, OUTPUT);
 
-        TongleLed(true); 
+        TongleLed(true);
         delay(1000);
         TongleLed(false);
     }
@@ -169,7 +108,8 @@ public:
 
     // Switch on led On or Off, True for On and False for Off
     void TongleLed(bool lights = true);
-    void TongleLed(bool lights = true){
+    void TongleLed(bool lights = true)
+    {
         led.LedOnOff(lights);
     }
 
@@ -180,34 +120,58 @@ public:
     bool IsSwitchOn();
 };
 
+class RelaySwitch
+{
 
-class RelaySwitch{
-    protected:
-    int Pin__O_Relay=0;
-    int Pin_I_InputSwitch=-999;
-    bool RelayState=false;
-    bool SwitchState=false;
-    public :
-    RelaySwitch(int relayPin);
-    RelaySwitch(int switchPin, int relayPin);
+protected:
+    int Pin_O_Relay = 0;
+    int Pin_I_InputSwitch = -999; // -666 Only RelayPin is activated
 
-    void InitSwitch(){
+    bool RelayState = false;
+    bool SwitchState = false;
+
+public:
+    RelaySwitch(int relayPin)
+    {
+
+        Pin_O_Relay = relayPin;
+        Pin_I_InputSwitch = -666;
+    }
+    RelaySwitch(int relayPin, int switchPin)
+    {
+        Pin_O_Relay = relayPin;
+        Pin_I_InputSwitch = switchPin;
+    }
+
+    void InitSwitch()
+    {
         pinMode(Pin_O_Relay, OUTPUT);
-        if(Pin_I_InputSwitch>=0)
-            pinMode(Pin_I_InputSwitch,OUTPUT);
+        if (Pin_I_InputSwitch >= 0)
+            pinMode(Pin_I_InputSwitch, OUTPUT);
     }
-    void TongleSwitch(bool state);
-    void RelayOnOFF(bool state=true);
-    bool IsRelayOn(){return RelayState;}
-    bool IsSwitchOn(){return SwitchState;}
-    void SetSwitchState(bool state=true)
-    { 
-        SwitchState=state;
-    }
-};
 
-class InputSwitch{
-    //TODO:
+    void TongleSwitch(bool state);
+    void RelayOnOFF(bool state = true);
+
+    bool IsRelayOn() { return RelayState; }
+    bool IsSwitchOn() { return SwitchState; }
+    void SetSwitchState(bool state = true)
+    {
+        SwitchState = state;
+    }
+
+    // SwitchOnOffRelay will operate and update status  of Input Switch
+    void SwitchOnOffRelay(bool relayonoff, bool inputmode, bool switchmode = NULL)
+    {
+        if (inputmode && switchmode != IsSwitchOn())
+        {
+
+            RelayOnOFF(relayonoff);
+            SetSwitchState(switchmode);
+        }
+        else
+            RelayOnOFF(relayonoff);
+    }
 };
 
 #endif
