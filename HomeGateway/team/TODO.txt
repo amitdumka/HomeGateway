@@ -1,0 +1,12 @@
+TouchPad:
+1. Merge TouchPad, TouchPad16 and TouchPad_int as much possible. 
+2. Test and use only most effiective and fast apporch, so there shouldn't be much delay. May be on version 3
+
+
+Devices:
+1.Make Devices as Lib option so i bundled in package which can be used as Lib for any project. 
+2. Create Each Device in seperate File and in Devices folder. and Create seperate CPP file . also start C++ Lib Support (.HPP)
+
+
+TODO List:
+1. Keep Updating on todo list and completed list. so it can know where to work and what is done.
